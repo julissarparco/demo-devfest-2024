@@ -20,4 +20,5 @@ resource "google_cloudfunctions_function_iam_member" "public_invoker" {
   cloud_function = google_cloudfunctions_function.sarcastic_response.name
   role           = "roles/cloudfunctions.invoker"
   member         = "allUsers"
+  depends_on     = [google_cloudfunctions_function.sarcastic_response]
 }
