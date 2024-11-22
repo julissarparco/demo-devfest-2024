@@ -1,0 +1,31 @@
+{
+  "name": "sarcastic-responses",
+  "version": "1.0.0",
+  "description": "Demo for Cloud Functions using TypeScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "yarn run clean && tsc",
+    "start": "yarn run build && functions-framework --target=sarcasticResponse",
+    "dev": "ts-node-dev src/index.ts"
+  },
+  "keywords": [],
+  "author": "@julissarparco",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.4.2",
+    "@google-cloud/secret-manager": "^5.6.0",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.7"
+  }
+}
