@@ -1,0 +1,47 @@
+name: Deploy to Google Cloud Functions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Build Application
+        run: yarn build
+
+      - name: Generate .zip File
+        run: zip -r sarcastic-function.zip .
+
+      - name: Upload to GCS
+        run: gsutil cp sarcastic-function.zip gs://${{ secrets.GCP_BUCKET_NAME }}/
+
+      - name: Terraform Init
+        run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Taint Cloud Function
+        run: terraform taint module.cloud_function.google_cloudfunctions_function.sarcastic_response
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Upload to GCS (via Terraform)
+        run: terraform apply -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}

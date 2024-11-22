@@ -9,7 +9,7 @@ resource "google_cloudfunctions_function" "sarcastic_response" {
   trigger_http = true
 
   environment_variables = {
-    PROJECT_ID     = var.project_id
+    GCP_PROJECT_ID = var.project_id
     GEMINI_API_KEY = var.gemini_api_key_secret
   }
 }

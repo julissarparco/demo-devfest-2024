@@ -2,7 +2,7 @@ import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 import { Request, Response } from 'express'
 import { GeminiService } from '../services/gemini.service'
 
-const PROJECT_ID = process.env.PROJECT_ID || 'dev-fest-2024-442206'
+const PROJECT_ID = process.env.GCP_PROJECT_ID
 
 const client = new SecretManagerServiceClient()
 
