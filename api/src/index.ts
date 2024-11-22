@@ -14,7 +14,7 @@ setupSwagger(app)
 const router = express.Router()
 
 router.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('DevFest - 2024!')
 })
 
 router.post('/sarcasm', sarcasticResponse)

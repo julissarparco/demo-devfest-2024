@@ -57,12 +57,19 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
-      - name: Taint Cloud Function
-        working-directory: ./terraform
-        run: terraform taint module.cloud_function.google_cloudfunctions_function.sarcastic_response
-
       - name: Apply Terraform
         working-directory: ./terraform
         run: terraform apply -var-file=variables.tfvars -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Deploy Cloud Function
+        working-directory: ./api
+        run: |
+          gcloud functions deploy sarcastic-response \
+            --runtime=nodejs18 \
+            --trigger-http \
+            --entry-point=sarcasticApp \
+            --region=${{ secrets.GCP_REGION }} \
+            --source=. \
+            --set-env-vars="GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}"
