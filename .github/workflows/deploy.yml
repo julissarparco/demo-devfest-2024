@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud Run Functions
+name: Deploy to Google Cloud Functions
 
 on:
   push:
@@ -15,11 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
       - name: Setup Google Cloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          credentials: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Verify Authentication
         run: gcloud auth list
@@ -43,17 +47,11 @@ jobs:
       - name: Terraform Init
         working-directory: ./terraform
         run: terraform init
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Taint Cloud Function
         working-directory: ./terraform
         run: terraform taint module.cloud_function.google_cloudfunctions_function.sarcastic_response
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
-      - name: Upload to GCS (via Terraform)
+      - name: Apply Terraform
         working-directory: ./terraform
         run: terraform apply -auto-approve
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
