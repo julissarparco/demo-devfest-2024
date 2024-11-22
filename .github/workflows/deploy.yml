@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud Functions
+name: Deploy to Google Cloud Run Functions
 
 on:
   push:
@@ -25,9 +25,6 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Verify Authentication
-        run: gcloud auth list
-
       - name: Install Dependencies
         working-directory: ./api
         run: yarn install
@@ -44,6 +41,18 @@ jobs:
         working-directory: ./api
         run: gsutil cp sarcastic-function.zip gs://${{ secrets.GCP_BUCKET_NAME }}/
 
+      - name: Create Terraform Variables File
+        working-directory: ./terraform
+        run: |
+          chmod +x ../scripts/create-tfvars.sh
+          ../scripts/create-tfvars.sh
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_SECRET: 'gemini-api-key'
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          REGION: ${{ secrets.GCP_REGION }}
+          SOURCE_ARCHIVE_OBJECT: 'sarcastic-function.zip'
+
       - name: Terraform Init
         working-directory: ./terraform
         run: terraform init
@@ -54,4 +63,6 @@ jobs:
 
       - name: Apply Terraform
         working-directory: ./terraform
-        run: terraform apply -auto-approve
+        run: terraform apply -var-file=variables.tfvars -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
