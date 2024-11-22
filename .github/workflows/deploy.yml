@@ -21,6 +21,9 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           credentials: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
+      - name: Verify Authentication
+        run: gcloud auth list
+
       - name: Install Dependencies
         working-directory: ./api
         run: yarn install
