@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud Functions
+name: Deploy to Google Cloud Run Functions
 
 on:
   push:
@@ -20,28 +20,35 @@ jobs:
           credentials: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Install Dependencies
+        working-directory: ./api
         run: yarn install
 
       - name: Build Application
+        working-directory: ./api
         run: yarn build
 
       - name: Generate .zip File
+        working-directory: ./api
         run: zip -r sarcastic-function.zip .
 
       - name: Upload to GCS
+        working-directory: ./api
         run: gsutil cp sarcastic-function.zip gs://${{ secrets.GCP_BUCKET_NAME }}/
 
       - name: Terraform Init
+        working-directory: ./terraform
         run: terraform init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Taint Cloud Function
+        working-directory: ./terraform
         run: terraform taint module.cloud_function.google_cloudfunctions_function.sarcastic_response
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Upload to GCS (via Terraform)
+        working-directory: ./terraform
         run: terraform apply -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
