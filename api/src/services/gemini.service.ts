@@ -15,7 +15,7 @@ export class GeminiService {
         {
           parts: [
             {
-              text: `Genera una respuesta sarcástica a: "${input}"`,
+              text: `Genera una respuesta sarcástica al comentario o pregunta: "${input}"`,
             },
           ],
         },
